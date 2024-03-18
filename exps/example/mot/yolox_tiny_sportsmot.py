@@ -32,7 +32,7 @@ class Exp(MyExp):
         self.no_aug_epochs = 10
         self.basic_lr_per_img = 0.001 / 64.0
         self.warmup_epochs = 1
-        self.data_num_workers = 0
+        self.data_num_workers = 1
 
     def get_data_loader(self, batch_size, is_distributed, no_aug=False):
         from SportsTracking.yolox.data import (
