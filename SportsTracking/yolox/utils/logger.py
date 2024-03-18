@@ -398,13 +398,13 @@ class WandbLogger(object):
         else:
             epoch = None
 
-        filename = os.path.join(save_dir, model_name + "_ckpt.pth")
+        filename = os.path.join(save_dir, model_name + "_ckpt.pth.tar")
         artifact = self.wandb.Artifact(
             name=f"run_{self.run.id}_model",
             type="model",
             metadata=metadata
         )
-        artifact.add_file(filename, name="model_ckpt.pth")
+        artifact.add_file(filename, name="model_ckpt.pth.tar")
 
         aliases = ["latest"]
 
