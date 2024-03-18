@@ -172,7 +172,7 @@ class Trainer:
         self.evaluator = self.exp.get_evaluator(
             batch_size=self.args.batch_size, is_distributed=self.is_distributed
         )
-        # Tensorboard logger
+        # Tensorboard and Wandb loggers
         if self.rank == 0:
             if self.args.logger == "tensorboard":
                 self.tblogger = SummaryWriter(os.path.join(self.file_name, "tensorboard"))
@@ -326,8 +326,8 @@ class Trainer:
 
     def evaluate_and_save_model(self):
         evalmodel = self.ema_model.ema if self.use_model_ema else self.model
-        ap50_95, ap50, summary = self.exp.eval(
-            evalmodel, self.evaluator, self.is_distributed
+        (ap50_95, ap50, summary), predictions = self.exp.eval(
+            evalmodel, self.evaluator, self.is_distributed, return_outputs=True
         )
         self.model.train()
 
