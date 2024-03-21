@@ -1,3 +1,4 @@
+import argparse
 import glob as gb
 import json
 import os
@@ -8,6 +9,14 @@ import numpy as np
 BASE_PATH = os.getcwd()
 VISUAL_BASE_PATH = os.path.join(BASE_PATH, 'visualisation/SportsMOT')
 
+def make_parser():
+    parser = argparse.ArgumentParser("Visualiser")
+    parser.add_argument("-s", "--split", type=str, default="val", choices=["train", "val", "test"])
+    parser.add_argument("-gt", default=False)
+    parser.add_argument("-expn", "--experiment-name", type=str, default=None)
+    parser.add_argument("-tracker", "--tracker", type=str, default="gt")
+    parser.add_argument("-sequence", "--sequence", type=str, default="v_00HRwkvvjtQ_c001")
+    return parser
 
 def colormap(rgb=False):
     color_list = np.array(
@@ -99,22 +108,23 @@ def colormap(rgb=False):
     return color_list
 
 
-def generate_images(tracker, split, sequence):
+def generate_images(gt, experiment_name, tracker, split, sequence):
     print("Starting image generation")
 
-    visual_path = os.path.join(VISUAL_BASE_PATH, split, tracker, sequence)
-    os.makedirs(visual_path, exist_ok=True)
     color_list = colormap()
-
     gt_json_path = os.path.join(BASE_PATH, 'datasets/SportsMOT/annotations', split + '.json')
     img_path = os.path.join(BASE_PATH, 'datasets/SportsMOT', split)
 
     img_dict = dict()
 
-    if tracker == "gt":
+    if gt:
         txt_path = os.path.join(BASE_PATH, 'datasets/SportsMOT', split, sequence, 'gt/gt.txt')
+        visual_path = os.path.join(VISUAL_BASE_PATH, split, "gt", sequence)
+        os.makedirs(visual_path, exist_ok=True)
     else:
-        txt_path = os.path.join(BASE_PATH, 'outputs', tracker, sequence + '.txt')
+        txt_path = os.path.join(BASE_PATH, 'outputs', experiment_name, f"track_results_{tracker}", sequence + '.txt')
+        visual_path = os.path.join(VISUAL_BASE_PATH, split, experiment_name, tracker, sequence)
+        os.makedirs(visual_path, exist_ok=True)
 
     with open(gt_json_path, 'r') as f:
         gt_json = json.load(f)
@@ -153,10 +163,14 @@ def generate_images(tracker, split, sequence):
     print("Image generation done")
 
 
-def generate_video_from_images(tracker, split, sequence):
+def generate_video_from_images(gt, experiment_name, tracker, split, sequence):
     print("Starting video generation from images")
 
-    visual_path = os.path.join(VISUAL_BASE_PATH, split, tracker, sequence)
+    if gt:
+        visual_path = os.path.join(VISUAL_BASE_PATH, split, "gt", sequence)
+    else:
+        visual_path = os.path.join(VISUAL_BASE_PATH, split, experiment_name, tracker, sequence)
+
     img_paths = gb.glob(visual_path + "/*.png")
     fps = 25
     size = (1920, 1080)
@@ -172,8 +186,7 @@ def generate_video_from_images(tracker, split, sequence):
 
 
 if __name__ == '__main__':
-    tracker = "gt"  # or "tracker"
-    split = "val"  # or "train" or "test"
-    sequence = "v_00HRwkvvjtQ_c001"
-    generate_images(tracker, split, sequence)
-    generate_video_from_images(tracker, split, sequence)
+    args = make_parser().parse_args()
+
+    generate_images(args.gt, args.experiment_name, args.tracker, args.split, args.sequence)
+    generate_video_from_images(args.gt, args.experiment_name, args.tracker, args.split, args.sequence)

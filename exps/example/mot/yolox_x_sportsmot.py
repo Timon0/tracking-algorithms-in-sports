@@ -8,28 +8,27 @@ from SportsTracking.yolox.data import get_yolox_datadir
 from SportsTracking.yolox.exp import Exp as MyExp
 
 
-# Trained model bytetrack_tiny_mot17 from https://github.com/ifzhang/ByteTrack
+# Trained model yolox_x_sports_train from https://github.com/MCG-NJU/MixSort
 #
-# Backbone: YOLOX tiny
-# Training data: COCO, CrowdHuman, MOT17, Cityperson and ETHZ
+# Backbone: YOLOX-X
+# Training data: COCO, CrowdHuman and SportsMOT
 
 class Exp(MyExp):
     def __init__(self):
         super(Exp, self).__init__()
         self.num_classes = 1
-        self.depth = 0.33
-        self.width = 0.375
-        self.scale = (0.5, 1.5)
+        self.depth = 1.33
+        self.width = 1.25
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
         self.train_ann = "train.json"
-        self.val_ann = "val.json"
-        self.input_size = (608, 1088)
-        self.test_size = (608, 1088)
-        self.random_size = (12, 26)
+        self.val_ann = "val.json"   # change to train.json when running on training set
+        self.input_size = (800, 1440)
+        self.test_size = (800, 1440)
+        self.random_size = (18, 32)
         self.max_epoch = 80
         self.print_interval = 20
-        self.eval_interval = 5
-        self.test_conf = 0.001
+        self.eval_interval = 1
+        self.test_conf = 0.1
         self.nmsthre = 0.7
         self.no_aug_epochs = 10
         self.basic_lr_per_img = 0.001 / 64.0
@@ -47,14 +46,14 @@ class Exp(MyExp):
         )
 
         dataset = MOTDataset(
-            data_dir=os.path.join(get_yolox_datadir(), "mix_det"),
+            data_dir=os.path.join(get_yolox_datadir(), "SportsMOT"),
             json_file=self.train_ann,
-            name='',
+            name='train',
             img_size=self.input_size,
             preproc=TrainTransform(
                 rgb_means=(0.485, 0.456, 0.406),
                 std=(0.229, 0.224, 0.225),
-                max_labels=500,
+                max_labels=600,
             ),
         )
 
@@ -65,7 +64,7 @@ class Exp(MyExp):
             preproc=TrainTransform(
                 rgb_means=(0.485, 0.456, 0.406),
                 std=(0.229, 0.224, 0.225),
-                max_labels=1000,
+                max_labels=1200,
             ),
             degrees=self.degrees,
             translate=self.translate,
@@ -105,11 +104,11 @@ class Exp(MyExp):
             data_dir=os.path.join(get_yolox_datadir(), "SportsMOT"),
             json_file=self.val_ann,
             img_size=self.test_size,
-            name='val',
+            name='val', # change to train when running on training set
             preproc=ValTransform(
                 rgb_means=(0.485, 0.456, 0.406),
                 std=(0.229, 0.224, 0.225),
-            ),
+            )
         )
 
         sampler = torch.utils.data.SequentialSampler(valdataset)

@@ -78,7 +78,21 @@ More information available [here](https://docs.wandb.ai/guides/integrations/othe
 ### SORT
 
 ```shell
-python tools/track_sort.py -f exps/example/mot/yolox_tiny_mix_det.py -c pretrained/bytetrack_tiny_mot17.pth.tar -b 1 --fp16 --fuse
+python tools/track/track_sort.py -f exps/example/mot/yolox_x_sportsmot.py -c pretrained/yolox_x_sports_train.pth.tar -b 1 --fp16 --fuse
+```
+
+### DeepSORT
+
+Before using DeepSort, download the ckpt.t7 file from [here](https://drive.google.com/drive/folders/1xhG0kRH1EX5B9_Iz8gQJb7UNnn_riXi6) and save it to the folder `pretrained`.
+
+```shell
+python tools/track/track_deepsort.py -f exps/example/mot/yolox_x_sportsmot.py -c pretrained/yolox_x_sports_train.pth.tar -b 1 --fp16 --fuse
+```
+
+### ByteTrack
+
+```shell
+python tools/track/track_bytetrack.py -f exps/example/mot/yolox_x_sportsmot.py -c pretrained/yolox_x_sports_train.pth.tar -b 1 --fp16 --fuse
 ```
 
 ## Evaluation
@@ -86,20 +100,20 @@ Prepare data for evaluation with [TrackEval](https://github.com/JonathonLuiten/T
 
 ```shell
 python tools/data/convert_sportsmot_gt_to_trackeval.py
-python tools/data/convert_sportsmot_tracker_to_trackeval.py
+# Example to convert the tracker results of the SORT tracker on the validation split
+python tools/data/convert_sportsmot_tracker_to_trackeval.py -s val -expn yolox_x_sportsmot -tracker sort
 ```
 
-Use the command below to evaluate tracking results. It's recommended to tweak the script's parameters beforehand.
-
 ```shell
-python tools/evaluate  
+# Example to evaluate the tracking results of the SORT tracker of the validation split
+python tools/evaluation/evaluate-sportsmot.py -s val -expn yolox_x_sportsmot -tracker sort
 ```
 
 ## Visualisation
 Use the command below to visualise tracking results. The generated files are stored in the `visualisation` folder. It's recommended to tweak the script's parameters beforehand.
 
 ```shell
-python tools/visualisation/visualiser.py
+python tools/visualisation/visualiser.py -s val -expn yolox_x_sportsmot -tracker sort -sequence v_00HRwkvvjtQ_c001
 ```
 
 
