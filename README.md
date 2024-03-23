@@ -40,7 +40,7 @@ The COCO pretrained YOLOX model can be downloaded from their [model zoo](https:/
 
 Train pretrained yolox model on SportsMOT dataset 
 ```shell
-python tools/train_yolox.py -f exps/example/mot/yolox_tiny_sportsmot.py -b 4 --fp16 -c pretrained/yolox_tiny.pth
+python tools/train_yolox.py -f exps/example/mot/yolox_tiny_sportsmot.py -b 64 --fp16 -c pretrained/yolox_tiny.pth
 ```
 
 **Weights & Biases for Logging**

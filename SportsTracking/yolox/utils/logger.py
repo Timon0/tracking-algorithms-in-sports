@@ -423,7 +423,6 @@ class WandbLogger(object):
     def initialize_wandb_logger(cls, args, exp, val_dataset):
         wandb_params = dict()
         wandb_params.update({'name': args.experiment_name})
-        wandb_params.update({'id': args.experiment_name})
         wandb_params.update({'save_dir': os.path.join(exp.output_dir, args.experiment_name)})
 
         prefix = "wandb-"
