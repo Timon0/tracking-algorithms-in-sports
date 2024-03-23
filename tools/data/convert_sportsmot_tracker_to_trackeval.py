@@ -1,15 +1,30 @@
 import os
-import shutil
+import argparse
 
-TRACKEVAL_TRACKER_ROOT = os.path.join(os.getcwd(), "TrackEval/data/trackers/mot_challenge/SportsMOT-val/yolox_tiny_mix_det-track_results_sort")
-TRACKEVAL_TRACKER_DATA_ROOT = os.path.join(TRACKEVAL_TRACKER_ROOT, "data")
-SPORTSMOT_EXPERIMENT_DATA_ROOT = os.path.join(os.getcwd(), "outputs/yolox_tiny_mix_det/track_results_sort")
-MY_BENCHMARK_NAME = "SportsMOT"
-NO_SUBDIR = True
-# ========default hierarchy========
-# folder hierarchy according to
-# https://github.com/JonathonLuiten/TrackEval/blob/master/docs/MOTChallenge-Official/Readme.md#evaluating-on-your-own-data
-os.makedirs(TRACKEVAL_TRACKER_ROOT, exist_ok=True)
+def make_parser():
+    parser = argparse.ArgumentParser("")
+    parser.add_argument("-s", "--split", type=str, default="val", choices=["train", "val", "test"])
+    parser.add_argument("-expn", "--experiment-name", type=str, default="yolox_x_sportsmot")
+    parser.add_argument("-tracker", "--tracker", type=str, default="sort")
+    return parser
 
-# create symlink for data
-os.symlink(SPORTSMOT_EXPERIMENT_DATA_ROOT, TRACKEVAL_TRACKER_DATA_ROOT, target_is_directory=True)
+def main(split, experiment_name, tracker):
+    benchmark = f"SportsMOT-{split}"
+    tracker_results = f"track_results_{tracker}"
+    trackeval_tracker_results = f"{experiment_name}-{tracker_results}"
+    TRACKEVAL_TRACKER_ROOT = os.path.join(os.getcwd(), "TrackEval/data/trackers/mot_challenge", benchmark,  trackeval_tracker_results)
+    TRACKEVAL_TRACKER_DATA_ROOT = os.path.join(TRACKEVAL_TRACKER_ROOT, "data")
+    SPORTSMOT_EXPERIMENT_DATA_ROOT = os.path.join(os.getcwd(), "outputs", experiment_name, tracker_results)
+
+    # ========default hierarchy========
+    # folder hierarchy according to
+    # https://github.com/JonathonLuiten/TrackEval/blob/master/docs/MOTChallenge-Official/Readme.md#evaluating-on-your-own-data
+    os.makedirs(TRACKEVAL_TRACKER_ROOT, exist_ok=True)
+
+    # create symlink for data
+    os.symlink(SPORTSMOT_EXPERIMENT_DATA_ROOT, TRACKEVAL_TRACKER_DATA_ROOT, target_is_directory=True)
+
+if __name__ == "__main__":
+    args = make_parser().parse_args()
+
+    main(args.split, args.experiment_name, args.tracker)

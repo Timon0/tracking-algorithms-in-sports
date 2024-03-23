@@ -162,10 +162,11 @@ cython_debug/
 config/
 wandb/
 checkpoints/
-
+1
 datasets/SportsMOT_example
 datasets/SportsMOT
 *.zip
 *.pth
 *.tar
 outputs
+pretrained/ckpt.t7

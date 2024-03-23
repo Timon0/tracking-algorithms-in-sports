@@ -10,17 +10,14 @@ import torch
 from loguru import logger
 from tqdm import tqdm
 
-# from SportsTracking.yolox.byte_tracker.byte_tracker import BYTETracker
+from SportsTracking.trackers.byte_track.byte_tracker import BYTETracker
+from SportsTracking.trackers.deepsort.deepsort import DeepSort
 from SportsTracking.trackers.sort.sort import Sort
 from SportsTracking.yolox.utils import (
     is_main_process,
     postprocess,
     xyxy2xywh
 )
-
-
-# from SportsTracking.yolox.deepsort_tracker.deepsort import DeepSort
-# from SportsTracking.yolox.motdt_tracker.motdt_tracker import OnlineTracker
 
 
 def write_results(filename, results):
@@ -73,6 +70,113 @@ class MOTEvaluator:
         self.num_classes = num_classes
         self.args = args
 
+    def evaluate_bytetrack(
+        self,
+        model,
+        distributed=False,
+        half=False,
+        trt_file=None,
+        decoder=None,
+        test_size=None,
+        result_folder=None
+    ):
+        """
+        COCO average precision (AP) Evaluation. Iterate inference on the test dataset
+        and the results are evaluated by COCO API.
+
+        NOTE: This function will change training mode to False, please save states if needed.
+
+        Args:
+            model : model to evaluate.
+
+        Returns:
+            ap50_95 (float) : COCO AP of IoU=50:95
+            ap50 (float) : COCO AP of IoU=50
+            summary (sr): summary info of evaluation.
+        """
+        # TODO half to amp_test
+        tensor_type = torch.cuda.HalfTensor if half else torch.cuda.FloatTensor
+        model = model.eval()
+        if half:
+            model = model.half()
+        ids = []
+        data_list = []
+        results = []
+        video_names = defaultdict()
+
+        inference_time = 0
+        track_time = 0
+        n_samples = len(self.dataloader) - 1
+
+        tracker = BYTETracker(self.args)
+
+        for cur_iter, (imgs, _, info_imgs, ids) in enumerate(tqdm(self.dataloader)):
+            with torch.no_grad():
+                # init tracker
+                frame_id = info_imgs[2].item()
+                video_id = info_imgs[3].item()
+                img_file_name = info_imgs[4]
+                video_name = img_file_name[0].split('/')[0]
+
+                if video_name not in video_names:
+                    video_names[video_id] = video_name
+                if frame_id == 1:
+                    tracker = BYTETracker(self.args)
+                    if len(results) != 0:
+                        result_filename = os.path.join(result_folder, '{}.txt'.format(video_names[video_id - 1]))
+                        write_results(result_filename, results)
+                        results = []
+
+                imgs = imgs.type(tensor_type)
+
+                # skip the last iters since batchsize might be not enough for batch inference
+                is_time_record = cur_iter < len(self.dataloader) - 1
+                if is_time_record:
+                    start = time.time()
+
+                outputs = model(imgs)
+                if decoder is not None:
+                    outputs = decoder(outputs, dtype=outputs.type())
+
+                outputs = postprocess(outputs, self.num_classes, self.confthre, self.nmsthre)
+
+                if is_time_record:
+                    infer_end = time.time()
+                    inference_time += infer_end - start
+
+            output_results = self.convert_to_coco_format(outputs, info_imgs, ids)
+            data_list.extend(output_results)
+
+            # run tracking
+            if outputs[0] is not None:
+                online_targets = tracker.update(outputs[0], info_imgs, self.img_size)
+                online_tlwhs = []
+                online_ids = []
+                online_scores = []
+                for t in online_targets:
+                    tlwh = t.tlwh
+                    tid = t.track_id
+                    vertical = tlwh[2] / tlwh[3] > 1.6
+                    if tlwh[2] * tlwh[3] > self.args.min_box_area and not vertical:
+                        online_tlwhs.append(tlwh)
+                        online_ids.append(tid)
+                        online_scores.append(t.score)
+                # save results
+                results.append((frame_id, online_tlwhs, online_ids, online_scores))
+
+            if is_time_record:
+                track_end = time.time()
+                track_time += track_end - infer_end
+
+            if cur_iter == len(self.dataloader) - 1:
+                result_filename = os.path.join(result_folder, '{}.txt'.format(video_names[video_id]))
+                write_results(result_filename, results)
+
+        statistics = torch.cuda.FloatTensor([inference_time, track_time, n_samples])
+
+        eval_results = self.evaluate_prediction(data_list, statistics)
+        return eval_results
+
     def evaluate_sort(
         self,
         model,
@@ -110,9 +214,9 @@ class MOTEvaluator:
         inference_time = 0
         track_time = 0
         n_samples = len(self.dataloader) - 1
-            
+
         tracker = Sort(self.args.track_thresh)
-        
+
         for cur_iter, (imgs, _, info_imgs, ids) in enumerate(tqdm(self.dataloader)):
             with torch.no_grad():
                 # init tracker
@@ -151,23 +255,130 @@ class MOTEvaluator:
             data_list.extend(output_results)
 
             # run tracking
-            online_targets = tracker.update(outputs[0], info_imgs, self.img_size)
-            online_tlwhs = []
-            online_ids = []
-            for t in online_targets:
-                tlwh = [t[0], t[1], t[2] - t[0], t[3] - t[1]]
-                tid = t[4]
-                vertical = tlwh[2] / tlwh[3] > 1.6
-                if tlwh[2] * tlwh[3] > self.args.min_box_area and not vertical:
-                    online_tlwhs.append(tlwh)
-                    online_ids.append(tid)
-            # save results
-            results.append((frame_id, online_tlwhs, online_ids))
+            if outputs[0] is not None:
+                online_targets = tracker.update(outputs[0], info_imgs, self.img_size)
+                online_tlwhs = []
+                online_ids = []
+                for t in online_targets:
+                    tlwh = [t[0], t[1], t[2] - t[0], t[3] - t[1]]
+                    tid = t[4]
+                    vertical = tlwh[2] / tlwh[3] > 1.6
+                    if tlwh[2] * tlwh[3] > self.args.min_box_area and not vertical:
+                        online_tlwhs.append(tlwh)
+                        online_ids.append(tid)
+                # save results
+                results.append((frame_id, online_tlwhs, online_ids))
 
             if is_time_record:
                 track_end = time.time()
                 track_time += track_end - infer_end
             
+            if cur_iter == len(self.dataloader) - 1:
+                result_filename = os.path.join(result_folder, '{}.txt'.format(video_names[video_id]))
+                write_results_no_score(result_filename, results)
+
+        statistics = torch.cuda.FloatTensor([inference_time, track_time, n_samples])
+
+        eval_results = self.evaluate_prediction(data_list, statistics)
+        return eval_results
+
+    def evaluate_deepsort(
+            self,
+            model,
+            distributed=False,
+            half=False,
+            trt_file=None,
+            decoder=None,
+            test_size=None,
+            result_folder=None,
+            model_folder=None
+    ):
+        """
+        COCO average precision (AP) Evaluation. Iterate inference on the test dataset
+        and the results are evaluated by COCO API.
+
+        NOTE: This function will change training mode to False, please save states if needed.
+
+        Args:
+            model : model to evaluate.
+
+        Returns:
+            ap50_95 (float) : COCO AP of IoU=50:95
+            ap50 (float) : COCO AP of IoU=50
+            summary (sr): summary info of evaluation.
+        """
+        # TODO half to amp_test
+        tensor_type = torch.cuda.HalfTensor if half else torch.cuda.FloatTensor
+        model = model.eval()
+        if half:
+            model = model.half()
+        ids = []
+        data_list = []
+        results = []
+        video_names = defaultdict()
+
+        inference_time = 0
+        track_time = 0
+        n_samples = len(self.dataloader) - 1
+
+        tracker = DeepSort(model_folder, min_confidence=self.args.track_thresh)
+
+        for cur_iter, (imgs, _, info_imgs, ids) in enumerate(tqdm(self.dataloader)):
+            with torch.no_grad():
+                # init tracker
+                frame_id = info_imgs[2].item()
+                video_id = info_imgs[3].item()
+                img_file_name = info_imgs[4]
+                video_name = img_file_name[0].split('/')[0]
+
+                if video_name not in video_names:
+                    video_names[video_id] = video_name
+                if frame_id == 1:
+                    tracker = DeepSort(model_folder, min_confidence=self.args.track_thresh)
+                    if len(results) != 0:
+                        result_filename = os.path.join(result_folder, '{}.txt'.format(video_names[video_id - 1]))
+                        write_results_no_score(result_filename, results)
+                        results = []
+
+                imgs = imgs.type(tensor_type)
+
+                # skip the last iters since batchsize might be not enough for batch inference
+                is_time_record = cur_iter < len(self.dataloader) - 1
+                if is_time_record:
+                    start = time.time()
+
+                outputs = model(imgs)
+                if decoder is not None:
+                    outputs = decoder(outputs, dtype=outputs.type())
+
+                outputs = postprocess(outputs, self.num_classes, self.confthre, self.nmsthre)
+
+                if is_time_record:
+                    infer_end = time.time()
+                    inference_time += infer_end - start
+
+            output_results = self.convert_to_coco_format(outputs, info_imgs, ids)
+            data_list.extend(output_results)
+
+            # run tracking
+            if outputs[0] is not None:
+                online_targets = tracker.update(outputs[0], info_imgs, self.img_size, img_file_name[0])
+                online_tlwhs = []
+                online_ids = []
+                for t in online_targets:
+                    tlwh = [t[0], t[1], t[2] - t[0], t[3] - t[1]]
+                    tid = t[4]
+                    vertical = tlwh[2] / tlwh[3] > 1.6
+                    if tlwh[2] * tlwh[3] > self.args.min_box_area and not vertical:
+                        online_tlwhs.append(tlwh)
+                        online_ids.append(tid)
+                # save results
+                results.append((frame_id, online_tlwhs, online_ids))
+
+            if is_time_record:
+                track_end = time.time()
+                track_time += track_end - infer_end
+
             if cur_iter == len(self.dataloader) - 1:
                 result_filename = os.path.join(result_folder, '{}.txt'.format(video_names[video_id]))
                 write_results_no_score(result_filename, results)
