@@ -1,11 +1,10 @@
-# TODO: Update with exact module version
-numpy==1.24.0
-torch>=1.7
+numpy
+torch
+torchvision
 opencv_python
 loguru
 scikit-image
 tqdm
-torchvision>=0.10.0
 Pillow
 thop
 ninja
@@ -14,3 +13,7 @@ tensorboard
 lap
 filterpy
 h5py
+wandb
+cython
+pycocotools
+cython_bbox

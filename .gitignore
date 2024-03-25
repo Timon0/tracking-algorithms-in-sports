@@ -170,3 +170,4 @@ datasets/SportsMOT
 *.tar
 outputs
 pretrained/ckpt.t7
+.wandbkey
