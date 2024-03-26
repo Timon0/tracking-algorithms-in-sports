@@ -43,7 +43,6 @@ def get_extensions():
 with open("README.md", "r") as f:
     long_description = f.read()
 
-print('test')
 print(get_extensions())
 
 setuptools.setup(

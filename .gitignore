@@ -171,3 +171,4 @@ datasets/SportsMOT
 outputs
 pretrained/ckpt.t7
 .wandbkey
+artifacts

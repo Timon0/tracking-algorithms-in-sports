@@ -106,7 +106,7 @@ python tools/data/convert_sportsmot_tracker_to_trackeval.py -s val -expn yolox_x
 
 ```shell
 # Example to evaluate the tracking results of the SORT tracker of the validation split
-python tools/evaluation/evaluate-sportsmot.py -s val -expn yolox_x_sportsmot -tracker sort
+python tools/evaluation/evaluate-sportsmot.py -s val -expn yolox_tiny_sportsmot -tracker bytetrack
 ```
 
 ## Visualisation
