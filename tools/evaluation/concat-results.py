@@ -3,6 +3,7 @@ import numpy as np
 import sys
 import os
 
+METRICS = ['HOTA', 'MOTA', 'IDF1', 'IDSW']
 trackers = [
     {'folder': 'yolox_x_sportsmot-track_results_sort', 'name': 'SORT (YOLOX-X)', 'average-inference-time': 44.28 },
     {'folder': 'yolox_x_sportsmot-track_results_deepsort', 'name': 'DeepSORT (YOLOX-X)', 'average-inference-time':  71.41 },
