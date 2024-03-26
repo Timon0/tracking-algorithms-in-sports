@@ -26,4 +26,4 @@ def getResults(trackers):
 
 if __name__ == '__main__':
     result = getResults(trackers)
-    result.to_csv('../../outputs/result.csv', index=False)
+    result.to_csv('./outputs/result.csv', index=False)
