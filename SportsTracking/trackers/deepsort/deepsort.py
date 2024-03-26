@@ -5,7 +5,7 @@ import os
 
 from .reid_model import Extractor
 from SportsTracking.trackers.deepsort import kalman_filter, linear_assignment, iou_matching
-from SportsTracking.yolox.data.dataloading import get_yolox_datadir
+from SportsTracking.common.yolox.data.dataloading import get_yolox_datadir
 from .detection import Detection
 from .track import Track
 

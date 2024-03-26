@@ -8,8 +8,8 @@ import torch.backends.cudnn as cudnn
 from loguru import logger
 
 from SportsTracking.trackers.evaluators import MOTEvaluator
-from SportsTracking.yolox.exp import get_exp
-from SportsTracking.yolox.utils import fuse_model, get_model_info, setup_logger
+from SportsTracking.common.yolox.exp import get_exp
+from SportsTracking.common.yolox.utils import fuse_model, get_model_info, setup_logger
 
 
 def make_parser():

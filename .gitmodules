@@ -1,3 +1,7 @@
 [submodule "TrackEval"]
 	path = TrackEval
 	url = https://github.com/Timon0/TrackEval.git
+[submodule "libs/DCNv2"]
+	path = libs/DCNv2
+	url = https://github.com/Timon0/DCNv2_latest.git
+	branch = pytorch1.9

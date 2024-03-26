@@ -17,3 +17,6 @@ wandb
 cython
 pycocotools
 cython_bbox
+yacs
+fvcore
+progress
