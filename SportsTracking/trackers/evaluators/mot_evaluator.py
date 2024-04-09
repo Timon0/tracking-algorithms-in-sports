@@ -13,7 +13,7 @@ from tqdm import tqdm
 from SportsTracking.trackers.byte_track.byte_tracker import BYTETracker
 from SportsTracking.trackers.deepsort.deepsort import DeepSort
 from SportsTracking.trackers.sort.sort import Sort
-from SportsTracking.yolox.utils import (
+from SportsTracking.common.yolox.utils import (
     is_main_process,
     postprocess,
     xyxy2xywh
@@ -462,7 +462,7 @@ class MOTEvaluator:
                 logger.warning("Use standard COCOeval.")
             '''
             #from pycocotools.cocoeval import COCOeval
-            from SportsTracking.yolox.layers import COCOeval_opt as COCOeval
+            from SportsTracking.common.yolox.layers import COCOeval_opt as COCOeval
             cocoEval = COCOeval(cocoGt, cocoDt, annType[1])
             cocoEval.evaluate()
             cocoEval.accumulate()

@@ -27,10 +27,16 @@ datasets
 
 ```
 
-Then, you need to turn the datasets to COCO format and prepare data for evaluation with :
+Then, you need to turn the datasets to COCO format and prepare data for evaluation with:
 
 ```shell
 python tools/data/convert_sportsmot_to_coco.py
+```
+
+FairMOT uses a file with all the images:
+
+```shell
+python tools/data/generate_labels_per_frame.py
 ```
 
 ## Training
@@ -40,7 +46,7 @@ The COCO pretrained YOLOX model can be downloaded from their [model zoo](https:/
 
 Train pretrained yolox model on SportsMOT dataset 
 ```shell
-python tools/train_yolox.py -f exps/example/mot/yolox_tiny_sportsmot.py -b 64 --fp16 -c pretrained/yolox_tiny.pth
+python tools/train/train_yolox.py -f exps/example/mot/yolox_tiny_sportsmot.py -b 64 --fp16 -c pretrained/yolox_tiny.pth
 ```
 
 **Weights & Biases for Logging**
@@ -57,13 +63,13 @@ Log in to your W&B account
 To start logging metrics to W&B during training add the flag `--logger` to the previous command and use the prefix "wandb-" to specify arguments for initializing the wandb run.
 
 ```shell
-python tools/train_yolox.py -f exps/example/mot/yolox_tiny_sportsmot.py -b 4 --fp16 -c pretrained/yolox_tiny.pth --logger wandb wandb-project <project name>
+python tools/train/train_yolox.py -f exps/example/mot/yolox_tiny_sportsmot.py -b 4 --fp16 -c pretrained/yolox_tiny.pth --logger wandb wandb-project <project name>
 ```
 
 More WandbLogger arguments include
 
 ```shell
-python tools/train_yolox.py .... --logger wandb wandb-project <project-name> \
+python tools/train/train_yolox.py .... --logger wandb wandb-project <project-name> \
                 wandb-name <run-name> \
                 wandb-id <run-id> \
                 wandb-save_dir <save-dir> \
@@ -72,6 +78,29 @@ python tools/train_yolox.py .... --logger wandb wandb-project <project-name> \
 ```
 
 More information available [here](https://docs.wandb.ai/guides/integrations/other/yolox).
+
+### FairMOT
+
+```shell
+python tools/train/train_fairmot.py mot --exp_id fairmot_sportsmot --gpus 0 --batch_size 32 --load_model 'pretrained/fairmot_dla34.pth' --num_epochs 60 --lr_step '50' --data_cfg 'SportsTracking/trackers/fairmot/cfg/sportsmot.json'
+```
+
+**Weights & Biases for Logging**
+
+To use W&B for logging, install wandb in your environment and log in to your W&B account using
+
+```shell
+pip install wandb
+wandb login
+```
+
+Log in to your W&B account
+
+To start logging metrics to W&B during training add the flag `--logger` to the previous command and use the prefix "wandb-" to specify arguments for initializing the wandb run.
+
+```shell
+python tools/train/train_fairmot.py mot --exp_id fairmot_sportsmot --gpus 0 --batch_size 16 --load_model 'pretrained/fairmot_dla34.pth' --num_epochs 60 --lr_step '50' --data_cfg 'SportsTracking/trackers/fairmot/cfg/sportsmot.json' --logger wandb wandb-project <project name>
+```
 
 ## Tracking
 
@@ -95,18 +124,24 @@ python tools/track/track_deepsort.py -f exps/example/mot/yolox_x_sportsmot.py -c
 python tools/track/track_bytetrack.py -f exps/example/mot/yolox_x_sportsmot.py -c pretrained/yolox_x_sports_train.pth.tar -b 1 --fp16 --fuse
 ```
 
+### FairMot
+
+```shell
+python tools/track/track_fairmot.py mot --load_model pretrained/fairmot_sportsmot.pth --conf_thres 0.6
+```
+
 ## Evaluation
 Prepare data for evaluation with [TrackEval](https://github.com/JonathonLuiten/TrackEval).
 
 ```shell
 python tools/data/convert_sportsmot_gt_to_trackeval.py
 # Example to convert the tracker results of the SORT tracker on the validation split
-python tools/data/convert_sportsmot_tracker_to_trackeval.py -s val -expn yolox_x_sportsmot -tracker sort
+python tools/data/convert_sportsmot_tracker_to_trackeval.py -s val -expn fairmot-sportsmot -tracker fairmot
 ```
 
 ```shell
 # Example to evaluate the tracking results of the SORT tracker of the validation split
-python tools/evaluation/evaluate-sportsmot.py -s val -expn yolox_tiny_sportsmot -tracker bytetrack
+python tools/evaluation/evaluate-sportsmot.py -s val -expn fairmot-sportsmot -tracker fairmot
 ```
 
 ## Visualisation
@@ -119,4 +154,4 @@ python tools/visualisation/visualiser.py -s val -expn yolox_x_sportsmot -tracker
 
 ## Acknowledgement
 
-The code is mainly based on [ByteTrack](https://github.com/ifzhang/ByteTrack), [YOLO](https://github.com/Megvii-BaseDetection/YOLOX) and [MixSort](https://github.com/MCG-NJU/MixSort).
+The code is mainly based on [ByteTrack](https://github.com/ifzhang/ByteTrack), [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX), [MixSort](https://github.com/MCG-NJU/MixSort) and [FairMOT](https://github.com/ifzhang/FairMOT).

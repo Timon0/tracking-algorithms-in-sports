@@ -1,0 +1,6 @@
+{
+  "root": "./datasets/SportsMOT/train",
+  "train": {
+    "sportsmot_train": "./datasets/SportsMOT/train/train-images.txt"
+  }
+}
