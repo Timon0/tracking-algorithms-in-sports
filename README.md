@@ -11,8 +11,7 @@ conda install pytorch==2.2.0 torchvision==0.17.0 torchaudio==2.2.0 pytorch-cuda=
 conda activate sports-tracking
 
 pip install -r requirements.txt
-pip install cython pycocotools cython_bbox
-python setup.py develop
+sh make.sh
 ```
 
 ## Data preparation
@@ -42,7 +41,7 @@ python tools/data/generate_labels_per_frame.py
 ## Training
 
 ### YOLOX
-The COCO pretrained YOLOX model can be downloaded from their [model zoo](https://github.com/Megvii-BaseDetection/YOLOX). After downloading the pretrained models, you can put them under `pretrained`.
+The pretrained YOLOX model can be downloaded from their [model zoo](https://github.com/Megvii-BaseDetection/YOLOX). After downloading the pretrained models, you can put them under `pretrained`.
 
 Train pretrained yolox model on SportsMOT dataset 
 ```shell
@@ -81,6 +80,9 @@ More information available [here](https://docs.wandb.ai/guides/integrations/othe
 
 ### FairMOT
 
+The pretrained FairMOT model can be downloaded from their [model zoo](https://github.com/ifzhang/FairMOT). After downloading the pretrained models, you can put them under `pretrained`.
+
+
 ```shell
 python tools/train/train_fairmot.py mot --exp_id fairmot_sportsmot --gpus 0 --batch_size 32 --load_model 'pretrained/fairmot_dla34.pth' --num_epochs 60 --lr_step '50' --data_cfg 'SportsTracking/trackers/fairmot/cfg/sportsmot.json'
 ```
@@ -100,6 +102,23 @@ To start logging metrics to W&B during training add the flag `--logger` to the p
 
 ```shell
 python tools/train/train_fairmot.py mot --exp_id fairmot_sportsmot --gpus 0 --batch_size 16 --load_model 'pretrained/fairmot_dla34.pth' --num_epochs 60 --lr_step '50' --data_cfg 'SportsTracking/trackers/fairmot/cfg/sportsmot.json' --logger wandb wandb-project <project name>
+```
+
+### MOTR
+
+The pretrained FairMOT model can be downloaded from their [model zoo](https://github.com/megvii-research/MOTR). After downloading the pretrained models, you can put them under `pretrained`.
+
+```shell
+sh exps/motr/motr_sportsmot_train.sh
+```
+
+**Weights & Biases for Logging**
+
+To use W&B for logging, install wandb in your environment and log in to your W&B account using
+
+```shell
+pip install wandb
+wandb login
 ```
 
 ## Tracking
@@ -130,6 +149,12 @@ python tools/track/track_bytetrack.py -f exps/example/mot/yolox_x_sportsmot.py -
 python tools/track/track_fairmot.py mot --load_model pretrained/fairmot_sportsmot.pth --conf_thres 0.6
 ```
 
+### MOTR
+
+```shell
+sh exps/motr/motr_sportsmot_track.sh
+```
+
 ## Evaluation
 Prepare data for evaluation with [TrackEval](https://github.com/JonathonLuiten/TrackEval).
 
@@ -154,4 +179,4 @@ python tools/visualisation/visualiser.py -s val -expn yolox_x_sportsmot -tracker
 
 ## Acknowledgement
 
-The code is mainly based on [ByteTrack](https://github.com/ifzhang/ByteTrack), [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX), [MixSort](https://github.com/MCG-NJU/MixSort) and [FairMOT](https://github.com/ifzhang/FairMOT).
+The code is mainly based on [ByteTrack](https://github.com/ifzhang/ByteTrack), [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX), [MixSort](https://github.com/MCG-NJU/MixSort), [FairMOT](https://github.com/ifzhang/FairMOT) and [MOTR](https://github.com/megvii-research/MOTR).

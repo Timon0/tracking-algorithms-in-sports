@@ -20,3 +20,5 @@ cython_bbox
 yacs
 fvcore
 progress
+pandas
+seaborn

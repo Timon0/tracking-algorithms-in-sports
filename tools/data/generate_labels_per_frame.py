@@ -60,3 +60,6 @@ def generate_labels_per_frame(split):
 if __name__ == "__main__":
     generate_labels_per_frame('train')
     generate_images_list('train')
+
+    generate_labels_per_frame('val')
+    generate_images_list('val')
