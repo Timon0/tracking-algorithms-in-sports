@@ -161,12 +161,12 @@ Prepare data for evaluation with [TrackEval](https://github.com/JonathonLuiten/T
 ```shell
 python tools/data/convert_sportsmot_gt_to_trackeval.py
 # Example to convert the tracker results of the SORT tracker on the validation split
-python tools/data/convert_sportsmot_tracker_to_trackeval.py -s val -expn fairmot-sportsmot -tracker fairmot
+python tools/data/convert_sportsmot_tracker_to_trackeval.py -s val -expn yolox_tiny_sportsmot -tracker bytetrack
 ```
 
 ```shell
 # Example to evaluate the tracking results of the SORT tracker of the validation split
-python tools/evaluation/evaluate-sportsmot.py -s val -expn fairmot-sportsmot -tracker fairmot
+python tools/evaluation/evaluate-sportsmot.py -s val -sport football -expn yolox_tiny_sportsmot -tracker bytetrack
 ```
 
 ## Visualisation
@@ -175,6 +175,11 @@ Use the command below to visualise tracking results. The generated files are sto
 ```shell
 python tools/visualisation/visualiser.py -s val -expn yolox_x_sportsmot -tracker sort -sequence v_00HRwkvvjtQ_c001
 ```
+
+## Sports Field Registration for Football (POC)
+For mapping detections on a 2D football field, [SCCvSD](https://github.com/lood339/SCCvSD) is utilized. A demo is available at `tools/demo/scc_v_sd.ipynb`. 
+
+First, download the trained models from [here](https://docs.google.com/uc?export=download&id=1EaBmCzl4xnuebfoQnxU1xQgNmBy7mWi2) and save it to `pretrained/scc_v_sd`.
 
 
 ## Acknowledgement

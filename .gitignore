@@ -171,3 +171,5 @@ outputs
 pretrained/ckpt.t7
 .wandbkey
 artifacts
+visualisation/
+*.mat

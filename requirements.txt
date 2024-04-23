@@ -22,3 +22,7 @@ fvcore
 progress
 pandas
 seaborn
+
+## birds-eye-view
+pyflann-py3
+consoleprinter
