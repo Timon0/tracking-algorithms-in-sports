@@ -6,7 +6,7 @@
 # ------------------------------------------------------------------------
 
 
-EXP_DIR=outputs/motr_sportsmot_epoch05
+EXP_DIR=outputs/motr_sportsmot_v2
 python tools/track/track_motr.py \
     --meta_arch motr \
     --dataset_file e2e_sports \
@@ -15,7 +15,7 @@ python tools/track/track_motr.py \
     --lr_drop 10 \
     --lr 2e-4 \
     --lr_backbone 2e-5 \
-    --pretrained pretrained/motr_sportsmot_epoch05.pth \
+    --pretrained pretrained/motr_sportsmot.pth \
     --output_dir ${EXP_DIR} \
     --batch_size 1 \
     --sample_mode 'random_interval' \
@@ -31,4 +31,4 @@ python tools/track/track_motr.py \
     --extra_track_attn \
     --data_txt_path_train ./datasets/SportsMOT/train/train-images.txt \
     --data_txt_path_val ./datasets/SportsMOT/val/val-images.txt \
-    --resume pretrained/motr_sportsmot_epoch05.pth
+    --resume pretrained/motr_sportsmot.pth
