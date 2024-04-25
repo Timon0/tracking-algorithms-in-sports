@@ -24,7 +24,8 @@ def getResults(trackers):
         tracker_result = pd.read_csv(tracker_results_path, sep=" ")
         tracker_result = tracker_result[METRICS]
         tracker_result['tracker'] = tracker['name']
-        tracker_result['FPS'] = tracker['fps'] if 'fps' in tracker else round(1000 / tracker['average-inference-time'], 3)
+        fps = tracker['fps'] if 'fps' in tracker else round(1000 / tracker['average-inference-time'], 2)
+        tracker_result['FPS'] = "{:.2f}".format(fps)
         results.append(tracker_result)
     result = pd.concat(results, ignore_index=True)
     return result[['tracker', *METRICS, 'FPS']]
