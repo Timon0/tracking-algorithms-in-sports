@@ -13,7 +13,7 @@ trackers = [
     {'folder': 'fairmot-dla34-track_results_fairmot', 'name': 'FairMOT (base)', 'fps': 20.03},
     {'folder': 'fairmot-sportsmot-track_results_fairmot', 'name': 'FairMOT (SportsMOT)', 'fps': 20.05},
     {'folder': 'motr_final-track_results_motr', 'name': 'MOTR (base)', 'fps': 7.90},
-    {'folder': 'motr-sportsmot-track_results_motr', 'name': 'MOTR (SportsMOT)', 'fps': 7.55}
+    {'folder': 'motr-sportsmot-track_results_motr', 'name': 'MOTR (SportsMOT)', 'fps': 8.01}
 ]
 
 

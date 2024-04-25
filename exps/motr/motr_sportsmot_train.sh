@@ -7,7 +7,7 @@
 
 
 PRETRAIN=pretrained/model_motr_final.pth
-EXP=motr_sportsmot_v2
+EXP=motr_sportsmot
 EXP_DIR=outputs/${EXP}
 python tools/train/train_motr.py \
     --meta_arch motr \

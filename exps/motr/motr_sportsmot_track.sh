@@ -6,7 +6,7 @@
 # ------------------------------------------------------------------------
 
 
-EXP_DIR=outputs/motr_sportsmot_v2
+EXP_DIR=outputs/motr_sportsmot
 python tools/track/track_motr.py \
     --meta_arch motr \
     --dataset_file e2e_sports \
