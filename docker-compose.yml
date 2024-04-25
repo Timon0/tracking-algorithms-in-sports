@@ -3,7 +3,7 @@ version: '3.8'
 services:
   dev:
     build: .
-    container_name: tracking-alogrithms-in-sports
+    container_name: tracking-algorithms-in-sports
     volumes:
       - ./:/app/main
     working_dir: /app/main

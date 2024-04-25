@@ -29,7 +29,7 @@ def get_extensions():
 
     ext_modules = [
         extension(
-            "SportsTracking.yolox._C",
+            "SportsTracking.common.yolox._C",
             sources,
             include_dirs=include_dirs,
             define_macros=define_macros,

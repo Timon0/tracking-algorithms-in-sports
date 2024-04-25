@@ -21,8 +21,8 @@ def get_yolox_datadir():
     if yolox_datadir is None:
         import SportsTracking.common.yolox
 
-        yolox_path = os.path.dirname(os.path.dirname(SportsTracking.yolox.__file__))
-        yolox_datadir = os.path.join(yolox_path, "..", "datasets")
+        yolox_path = os.path.dirname(os.path.dirname(SportsTracking.common.yolox.__file__))
+        yolox_datadir = os.path.join(yolox_path, "..", "..", "datasets")
     return yolox_datadir
 
 
