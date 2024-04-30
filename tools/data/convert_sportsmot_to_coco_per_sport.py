@@ -18,15 +18,21 @@ from tqdm import tqdm
 DATA_PATH = "datasets/SportsMOT"
 OUT_PATH = os.path.join(DATA_PATH, "annotations")
 os.makedirs(OUT_PATH, exist_ok=True)
-SPLITS = ["train", "val", "test", "train_val"]
+split = "train_val"
+SPORTS_LIST = [['basketball'], ['football'], ['volleyball'], ['football', 'volleyball'], ['basketball', 'volleyball'], ['basketball', 'football']]
 HALF_VIDEO = False
 CREATE_SPLITTED_ANN = True
 USE_DET = False
 CREATE_SPLITTED_DET = False
 
-for split in SPLITS:
+def read_split_file(file_name):
+    with open(file_name, 'r') as file:
+        lines = set(file.read().splitlines())
+    return lines
+
+for sports in SPORTS_LIST:
     data_path = os.path.join(DATA_PATH, split)
-    out_path = os.path.join(OUT_PATH, "{}.json".format(split))
+    out_path = os.path.join(OUT_PATH, f"{split}-{'-'.join(sports)}.json")
     out = {
         "images": [],
         "annotations": [],
@@ -36,7 +42,10 @@ for split in SPLITS:
             "name": "pedestrian"
         }]
     }
-    video_list = os.listdir(data_path)
+    video_list = []
+    for sport in sports:
+        sport_split_file = os.path.join(DATA_PATH, 'splits_txt', f"{split}-{sport}.txt")
+        video_list.extend(read_split_file(sport_split_file))
     image_cnt = 0
     ann_cnt = 0
     video_cnt = 0
@@ -51,7 +60,7 @@ for split in SPLITS:
         images = os.listdir(img_path)
         num_images = len([image for image in images
                           if "jpg" in image])  # half and half
-        
+
         info_path = os.path.join(seq_path, "seqinfo.ini")
         with open(info_path, "r") as f:
             for line in f:

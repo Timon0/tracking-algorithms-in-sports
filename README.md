@@ -45,7 +45,7 @@ The pretrained YOLOX model can be downloaded from their [model zoo](https://gith
 
 Train pretrained yolox model on SportsMOT dataset 
 ```shell
-python tools/train/train_yolox.py -f exps/example/mot/yolox_tiny_sportsmot.py -b 64 --fp16 -c pretrained/yolox_tiny.pth
+python tools/train/train_yolox.py -f exps/yolox/yolox_tiny_sportsmot.py -b 32 --fp16 -c pretrained/yolox_tiny.pth
 ```
 
 **Weights & Biases for Logging**
@@ -62,7 +62,7 @@ Log in to your W&B account
 To start logging metrics to W&B during training add the flag `--logger` to the previous command and use the prefix "wandb-" to specify arguments for initializing the wandb run.
 
 ```shell
-python tools/train/train_yolox.py -f exps/example/mot/yolox_tiny_sportsmot.py -b 4 --fp16 -c pretrained/yolox_tiny.pth --logger wandb wandb-project <project name>
+python tools/train/train_yolox.py -f exps/yolox/yolox_tiny_sportsmot.py -b 32 --fp16 -c pretrained/yolox_tiny.pth --logger wandb wandb-project <project name>
 ```
 
 More WandbLogger arguments include
@@ -126,7 +126,7 @@ wandb login
 ### SORT
 
 ```shell
-python tools/track/track_sort.py -f exps/example/mot/yolox_x_sportsmot.py -c pretrained/yolox_x_sports_train.pth.tar -b 1 --fp16 --fuse
+python tools/track/track_sort.py -f exps/yolox/yolox_x_sportsmot.py -c pretrained/yolox_x_sports_train.pth.tar -b 1 --fp16 --fuse
 ```
 
 ### DeepSORT
@@ -134,13 +134,13 @@ python tools/track/track_sort.py -f exps/example/mot/yolox_x_sportsmot.py -c pre
 Before using DeepSort, download the ckpt.t7 file from [here](https://drive.google.com/drive/folders/1xhG0kRH1EX5B9_Iz8gQJb7UNnn_riXi6) and save it to the folder `pretrained`.
 
 ```shell
-python tools/track/track_deepsort.py -f exps/example/mot/yolox_x_sportsmot.py -c pretrained/yolox_x_sports_train.pth.tar -b 1 --fp16 --fuse
+python tools/track/track_deepsort.py -f exps/yolox/yolox_x_sportsmot.py -c pretrained/yolox_x_sports_train.pth.tar -b 1 --fp16 --fuse
 ```
 
 ### ByteTrack
 
 ```shell
-python tools/track/track_bytetrack.py -f exps/example/mot/yolox_x_sportsmot.py -c pretrained/yolox_x_sports_train.pth.tar -b 1 --fp16 --fuse
+python tools/track/track_bytetrack.py -f exps/yolox/yolox_x_sportsmot.py -c pretrained/yolox_x_sports_train.pth.tar -b 1 --fp16 --fuse
 ```
 
 ### FairMot

@@ -14,7 +14,7 @@ def write_file(file_name, lines):
 
 
 if __name__ == "__main__":
-    split = 'val'
+    split = 'train_val'
     split_file = os.path.join(SPORTSMOT_DATA_ROOT, split + '.txt')
     sequences_from_split = read_file(split_file)
 

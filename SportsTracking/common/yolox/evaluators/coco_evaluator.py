@@ -229,7 +229,7 @@ class COCOEvaluator:
                 cocoDt = cocoGt.loadRes(tmp)
             '''
             try:
-                from SportsTracking.yolox.layers import COCOeval_opt as COCOeval
+                from SportsTracking.common.yolox.layers import COCOeval_opt as COCOeval
             except ImportError:
                 from pycocotools import cocoeval as COCOeval
                 logger.warning("Use standard COCOeval.")
