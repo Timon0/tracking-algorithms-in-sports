@@ -59,6 +59,7 @@ def make_parser():
     parser.add_argument("--tsize", default=None, type=int, help="test img size")
     parser.add_argument("--seed", default=None, type=int, help="eval seed")
     # tracking args
+    parser.add_argument("--subfolder", default=None, type=str, help="name of the results subfolder")
     parser.add_argument("--track_thresh", type=float, default=0.6, help="tracking confidence threshold")
     parser.add_argument("--track_buffer", type=int, default=30, help="the frames for keep lost tracks")
     parser.add_argument("--match_thresh", type=float, default=0.9, help="matching threshold for tracking")
@@ -79,6 +80,8 @@ def main(exp, args):
     os.makedirs(file_name, exist_ok=True)
 
     results_folder = os.path.join(file_name, "track_results_bytetrack")
+    if args.subfolder:
+        results_folder = os.path.join(results_folder, args.subfolder)
     os.makedirs(results_folder, exist_ok=True)
 
     setup_logger(results_folder, distributed_rank=0, filename="val_log.txt", mode="a")

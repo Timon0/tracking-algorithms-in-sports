@@ -12,6 +12,7 @@ def make_parser():
     parser.add_argument("-sport", "--sport", type=str, default=None, choices=["football", "basketball", "volleyball"])
     parser.add_argument("-expn", "--experiment-name", type=str, default="yolox_x_sportsmot")
     parser.add_argument("-tracker", "--tracker", type=str, default="sort")
+    parser.add_argument("-subfolder", "--subfolder", type=str, default=None)
     return parser
 
 
@@ -43,20 +44,28 @@ if __name__ == '__main__':
     trackeval_tracker_results = f"{args.experiment_name}-{tracker_results}"
     GT_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'TrackEval/data/gt/mot_challenge'))
     TRACKERS_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'TrackEval/data/trackers/mot_challenge'))
+    if args.subfolder is not None:
+        TRACKER_SUB_FOLDER = os.path.join(args.subfolder, "data")
+    else:
+        TRACKER_SUB_FOLDER = "data"
+
     if args.sport is not None:
         seqmap_file_name = f"{BENCHMARK}-{args.split}-{args.sport}.txt"
     else:
         seqmap_file_name = f"{BENCHMARK}-{args.split}.txt"
     SEQMAP_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'TrackEval/data/gt/mot_challenge/seqmaps', seqmap_file_name))
     if args.sport is not None:
-        OUTPUT_SUB_FOLDER=args.sport
+        OUTPUT_SUB_FOLDER = args.sport
     else:
         OUTPUT_SUB_FOLDER = ''
+    if args.subfolder is not None:
+        OUTPUT_SUB_FOLDER = args.subfolder
 
     eval_mot(TRACKERS_TO_EVAL=[trackeval_tracker_results],
              BENCHMARK=BENCHMARK,
              SPLIT_TO_EVAL=args.split,
              TRACKERS_FOLDER=TRACKERS_FOLDER,
+             TRACKER_SUB_FOLDER=TRACKER_SUB_FOLDER,
              OUTPUT_SUB_FOLDER=OUTPUT_SUB_FOLDER,
              GT_FOLDER=GT_FOLDER,
              GT_LOC_FORMAT='{gt_folder}/{seq}/gt/gt.txt',
