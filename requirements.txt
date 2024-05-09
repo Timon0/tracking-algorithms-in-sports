@@ -22,6 +22,7 @@ fvcore
 progress
 pandas
 seaborn
+scikit-learn
 
 ## birds-eye-view
 pyflann-py3
