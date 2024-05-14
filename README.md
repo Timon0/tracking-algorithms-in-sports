@@ -176,6 +176,13 @@ Use the command below to visualise tracking results. The generated files are sto
 python tools/visualisation/visualiser.py -s val -expn yolox_x_sportsmot -tracker sort -sequence v_00HRwkvvjtQ_c001
 ```
 
+## Demo
+Use the command below to track and visualise players in a video. The generated files are stored in the `visualisation` folder. It's recommended to tweak the script's parameters beforehand.
+
+```shell
+python tools/demo/tracking.py video -f exps/yolox/yolox_tiny_sportsmot.py -c pretrained/yolox_tiny_sportsmot.pth.tar --fp16 --fuse --save_result --path ./videos/football.mp4
+```
+
 ## Sports Field Registration for Football (POC)
 For mapping detections on a 2D football field, [SCCvSD](https://github.com/lood339/SCCvSD) is utilized. A demo is available at `tools/demo/scc_v_sd.ipynb`. 
 
