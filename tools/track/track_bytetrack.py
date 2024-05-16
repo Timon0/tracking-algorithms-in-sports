@@ -44,7 +44,7 @@ def make_parser():
         dest="test",
         default=False,
         action="store_true",
-        help="Evaluating on test-dev set.",
+        help="Evaluating on test set.",
     )
     parser.add_argument(
         "opts",
@@ -84,7 +84,7 @@ def main(exp, args):
         results_folder = os.path.join(results_folder, args.subfolder)
     os.makedirs(results_folder, exist_ok=True)
 
-    setup_logger(results_folder, distributed_rank=0, filename="val_log.txt", mode="a")
+    setup_logger(results_folder, distributed_rank=0, filename="track_log.txt", mode="a")
     logger.info("Args: {}".format(args))
 
     if args.conf is not None:
