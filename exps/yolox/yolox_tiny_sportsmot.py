@@ -94,9 +94,9 @@ class Exp(MyExp):
 
         valdataset = MOTDataset(
             data_dir=os.path.join(get_yolox_datadir(), "SportsMOT"),
-            json_file=self.val_ann,
+            json_file=self.val_ann if not testdev else "test.json",
             img_size=self.test_size,
-            name='val',
+            name='val' if not testdev else 'test',
             preproc=ValTransform(
                 rgb_means=(0.485, 0.456, 0.406),
                 std=(0.229, 0.224, 0.225),
